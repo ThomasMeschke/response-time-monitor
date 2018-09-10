@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+            }
+            html{
+                background: black;
+                padding: 10px;
+            }
+            #page-wrap{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                align-items: stretch;
+                align-content: center;
+            }
+            .service-info-container{
+                margin: 10px;
+                width: 300px;
+                height: 90px;
+                padding: 10px;
+                background: #333;
+                border: 7px solid white;
+                color:black;
+                line-height: 30px;
+                flex-shrink: 1;
+                text-align: center;
+            }
+            .service-name{
+                display: block;
+                font-weight: bold;
+                font-size:1em;
+            }
+            .last-response-time{
+                display: block;
+                font-weight: bold;
+                font-size:2em;
+            }
+            .request-uri{
+                display: block;
+                font-size:0.75em;
+            }
+            .request-uri a{
+                color: black;
+                text-decoration: none;
+            }
+            .request-uri a:hover{
+                text-decoration: underline;
+            }
+            .bad{
+                background: #FF4848;
+            }
+            .medium{
+                background: #FFCB2F;
+            }
+            .good{
+                background: #1FCB4A;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="page-wrap">
+        <% @services.each do |service| %>
+        <% css_class = service.response_time_classification.to_s %>
+        <div class="service-info-container <%= css_class %>">
+            <span class="service-name"><%= service.name %></span>
+            <span class="last-response-time"><%= service.last_response_time.to_s %></span>
+            <span class="request-uri"><a href="<%= service.url %>"><%= service.url %></a></span>
+        </div>
+        <% end %>
+        </div>
+    </body>
+</html>

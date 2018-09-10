@@ -1,0 +1,22 @@
+{
+    "server-addr": "0.0.0.0",                       // mandatory;   specify the local address on which the web server should be reachable. "0.0.0.0" means any address.
+    "server-port": 8080,                            // mandatory;   specify the local port the web server should bind to.
+    "template-file": "templates//template.rhtml",   // mandatory;   specify the file which contains the ERB template for the web page.
+    "service-monitor": {
+        "watch-intervall-seconds": 5                // optional;    specify the amount of seconds between two response time calculations. Defaults to 10.
+    },
+    "services":[
+        {
+            "name": "Is it Friday yet",             // mandatory;   specify the name that should be shown on the web page.
+            "url": "www.isitfridayyet.net",         // mandatory;   specify the url under which the service can be reached.
+            "path": "/",                            // optional;    specify the request path that should be added to the url. Defaults to "/".
+            "port": 80,                             // optional;    specify the port under which the service is reachable. Defaults to 80.
+            "good_below_ms": 100,                   // optional;    specify the amount of milliseconds that separates a good from a medium connection. Defaults to 200.
+            "bad_above_ms": 300                     // optional;    specify the amount of milliseconds that separates a medium from a bad connection. Defaults to 500.
+        },
+        {   // this is what a minimal service config looks like
+            "name": "Google",
+            "url": "www.google.com"
+        }
+    ]
+}
