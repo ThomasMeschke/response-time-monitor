@@ -2,41 +2,42 @@
 
 require 'socket'
 
-# Offers the functionality to receive tcp requests and calls a lambda which should handle them. 
-# Cann be called blocking(listen) and non-blocking(listen_async)
+# Offers the functionality to receive tcp requests
+# and calls a lambda which should handle them.
+# Can be called blocking(listen) and non-blocking(listen_async)
 class WebServer
-    def initialize(addr, port)
-        @addr = addr
-        @port = port
-        @running = false
-    end
+  def initialize(addr, port)
+    @addr = addr
+    @port = port
+    @running = false
+  end
 
-    def listen(&callback)
-        @listener = TCPServer.new(@addr, @port)
-        @running = true
-        run(&callback)
-    end
+  def listen(&callback)
+    @listener = TCPServer.new(@addr, @port)
+    @running = true
+    run(&callback)
+  end
 
-    def listen_async(&callback)
-        @thread = Thread.new {listen(&callback)}
-    end
+  def listen_async(&callback)
+    @thread = Thread.new { listen(&callback) }
+  end
 
-    def run(&callback)
-        while @running do
-            session = @listener.accept
-            Thread.new {
-                callback.call(session)
-            }
-        end
-    end
+  def stop
+    return unless @thread.nil?
 
-    def stop
-        if !@thread.nil?
-            @running = false
-            @thread.kill
-            @thread.join
-        end
-    end
+    @running = false
+    @thread.kill
+    @thread.join
+  end
 
-    private :run
+  private
+
+  def run
+    while @running
+      session = @listener.accept
+      Thread.new do
+        yield(session) if block_given?
+      end
+    end
+  end
 end

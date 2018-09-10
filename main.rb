@@ -6,35 +6,38 @@ require_relative 'app/service_monitor'
 require_relative 'app/template_engine'
 require_relative 'app/web_server'
 
+Thread.abort_on_exception = false
+
 @services = []
-Config['services'].each { |service|
-    @services << Service.new(
-        service['name'], 
-        service['url'], 
-        service['path'], 
-        service['port'], 
-        service['good_below_ms'], 
-        service['bad_above_ms']
-    )
-}
+Config['services'].each do |service_config|
+  service = Service.new(
+    service_config['name'],
+    service_config['url'],
+    service_config['path'],
+    service_config['port']
+  )
+  service.good_below_ms ||= service_config['good_below_ms']
+  service.bad_above_ms ||= service_config['bad_above_ms']
+  @services << service
+end
 
 svc_monitor = ServiceMonitor.new(@services)
 
-webserver = WebServer.new(Config['server-addr'], Config['server-port'])
+web_server = WebServer.new(Config['server-addr'], Config['server-port'])
 
-@tmpl = TemplateEngine.new(Config['template-file'])
+@template = TemplateEngine.new(Config['template-file'])
 
 def on_client_connected
-    lambda { |client|
-        while !client.gets.chomp.empty? do
-        end
-        result = @tmpl.render(binding)
-        client.puts "HTTP/1.1 200 OK"
-        client.puts ""
-        client.puts result
-        client.close
-    }
+  lambda { |client|
+    unless client.gets.chomp.empty?
+    end
+    result = @template.render(binding)
+    client.puts 'HTTP/1.1 200 OK'
+    client.puts ''
+    client.puts result
+    client.close
+  }
 end
 
 svc_monitor.watch
-webserver.listen &on_client_connected
+web_server.listen(&on_client_connected)
