@@ -1,0 +1,69 @@
+@startuml
+activate Main
+Main -> Main: Config
+
+loop
+    Main -> Service: new(name, url, path, port)
+    activate Service
+    Main -> Service: @good_below_ms=...
+    Main -> Service: @bad_above_ms=...
+end
+
+Main -> ServiceMonitor: new(services)
+activate ServiceMonitor
+
+Main -> WebServer: new(addr, port)
+activate WebServer
+
+Main -> TemplateEngine: new(template-file)
+activate TemplateEngine
+
+Main ->> ServiceMonitor: watch
+
+ServiceMonitor -> ClockWork: new(interval)
+activate ClockWork
+
+ServiceMonitor ->> ClockWork: start
+
+Main ->> WebServer: listen
+
+WebServer -> WebServer: run
+activate WebServer
+
+loop
+    ClockWork -> ServiceMonitor: on_tick
+    ServiceMonitor ->> Service: determine_response_time_async
+
+    Service -> Service: determine_response_time
+    activate Service
+
+    Service -> Service: query
+    activate Service
+
+    entity "external Service"
+
+    Service -> "external Service": <<HTTP GET request>>
+    Service <-- "external Service": <<HTTP response>>
+
+    Service --> Service: result
+    deactivate Service
+
+    Service --> Service: @last_response_time=...
+    deactivate Service    
+end
+
+loop
+    entity "external Client"
+
+    WebServer <- "external Client": <<HTTP GET request>>
+    WebServer -> Main: on_client_connected(session)
+    activate Main
+    
+    Main -> TemplateEngine: render
+    TemplateEngine -> Main: result
+
+    Main -> WebServer: session.write(result)
+
+    WebServer -> "external Client": <<HTTP response>>
+end
+@enduml
