@@ -69,7 +69,7 @@
         <div class="service-info-container <%= css_class %>">
             <span class="service-name"><%= service.name %></span>
             <span class="last-response-time"><%= service.last_response_time.to_s %></span>
-            <span class="request-uri"><a href="<%= service.url %>"><%= service.url %></a></span>
+            <span class="request-uri"><a target="_blank" href="https://<%= service.url %>:<%= service.port %><%= service.path %>"><%= service.url %></a></span>
         </div>
         <% end %>
         </div>
