@@ -28,10 +28,14 @@ class Service
   end
 
   def determine_response_time
+    return if @call_pending
+
+    @call_pending = true
     @sw ||= StopWatch.new
     @sw.start
     result = query
     @sw.stop
+    @call_pending = false
 
     result = @sw.diff unless result.nil?
     @last_response_time = ResponseTime.new(result)
