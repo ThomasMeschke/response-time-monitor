@@ -14,7 +14,7 @@ class Service
     @name = name
     @url = url
     @path = path || '/'
-    @port = port || 80
+    @port = port
     @good_below_ms = 200
     @bad_above_ms = 500
     @last_response_time = ResponseTime.new(nil)
