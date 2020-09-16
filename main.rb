@@ -16,8 +16,8 @@ Config['services'].each do |service_config|
     service_config['path'],
     service_config['port']
   )
-  service.good_below_ms ||= service_config['good_below_ms']
-  service.bad_above_ms ||= service_config['bad_above_ms']
+  service.good_below_ms = service_config['good_below_ms'] ||service.good_below_ms
+  service.bad_above_ms = service_config['bad_above_ms'] || service.bad_above_ms
   @services << service
 end
 
